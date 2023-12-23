@@ -2,25 +2,56 @@ package com.jetbrains.ordercraft2.Dao.Implimentation;
 
 import com.jetbrains.ordercraft2.Dao.Interface.UserDao;
 import com.jetbrains.ordercraft2.Model.Classes.User;
-import com.jetbrains.ordercraft2.Config.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 public class UserDaoImpl implements UserDao {
 
-    @Override
-    public User addUser(User user){
-        Transaction transaction = null;
-        try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            transaction = session.beginTransaction();
-            session.save(user);
-            transaction.commit();
-        } catch (Exception e){
-            if (transaction != null){
-                transaction.rollback();
-            }
-            e.printStackTrace();
+    private static final SessionFactory sessionFactory;
+
+    static {
+        try {
+            // Create the SessionFactory from hibernate.cfg.xml
+            sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError(e);
         }
-        return user;
     }
+
+    public  User getUserByEmail(String email) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM User U WHERE U.email = :email";
+            Query<User> query = session.createQuery(hql, User.class);
+            query.setParameter("email", email);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public User login(String email, String password) {
+        try (Session session = sessionFactory.openSession()) {
+            Query<User> query = session.createQuery("FROM User WHERE email = :email AND password = :password", User.class);
+            query.setParameter("email", email);
+            query.setParameter("password", password);
+
+            return query.uniqueResult();
+        }
+    }
+
+    public User addUser(User user) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.save(user);
+            session.getTransaction().commit();
+            return user;
+        }
+    }
+
+
+
+
 }
