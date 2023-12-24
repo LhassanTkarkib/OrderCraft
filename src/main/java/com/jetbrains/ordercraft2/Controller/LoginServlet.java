@@ -19,12 +19,12 @@ public class LoginServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
-        userDao = new UserDaoImpl(); // Instantiate using the interface type
+        userDao = new UserDaoImpl();
     }
 
     private static final String loginForm = "/WEB-INF/views/loginM.jsp";
     private static final String adminDashboard = "/WEB-INF/views/admin.jsp";
-    private static final String clientDashboard = "/WEB-INF/views/client.jsp";
+    private static final String userDashboard = "/WEB-INF/views/client.jsp";
 
 
 
@@ -39,17 +39,12 @@ public class LoginServlet extends HttpServlet {
         User user = userDao.getUserByEmail(email);
 
         if (user != null && user.getPassword().equals(password)) {
-            // Authentication successful
             if (user.getRole()) {
-                // Redirect to admin dashboard
                 request.getRequestDispatcher(adminDashboard).forward(request, response);
             } else {
-                // Redirect to client dashboard
-                request.getRequestDispatcher(clientDashboard).forward(request, response);
-
+                request.getRequestDispatcher(userDashboard).forward(request, response);
             }
         } else {
-            // Authentication failed, redirect back to the login page
             request.getRequestDispatcher(loginForm).forward(request, response);
         }
     }

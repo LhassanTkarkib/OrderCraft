@@ -38,7 +38,7 @@
         <input class="morph_input" type="email" name="email" placeholder="Email">
         <input class="morph_input" type="password" name="password" placeholder="Password">
         <a href="#" class="for_get">Forget Your Password?</a>
-<%--        <input class="morph_button" type="submit" value="login">--%>
+
         <button >Sign In</button>
       </form>
     </div>
